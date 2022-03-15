@@ -26,15 +26,15 @@ export function PlaylistForm({ playlists, onSubmit, loading }: Props) {
          <Formik
             initialValues={initialForm}
             onSubmit={onSubmit}
-            render={({ values }) => (
+         >
+            {({ values }) => (
                <Form>
-                  <FieldArray
-                     name="sources"
-                     render={arrayHelpers => (
+                  <FieldArray name="sources">
+                     {(arrayHelpers) => (
                         <div>
                            {values.sources && values.sources.length > 0 ? (
                               values.sources.map((_source, index) => (
-                                 <div key={index}>
+                                 <div key={index} className="select-wrapper">
                                     <Field as="select" name={`sources.${index}`} className="main-dropDown-dropDown">
                                        <option value="">Select a source playlist</option>
                                        { playlists.map(({ id, name }) => (
@@ -59,12 +59,18 @@ export function PlaylistForm({ playlists, onSubmit, loading }: Props) {
                               className='main-buttons-button main-button-outlined'
                               type="button"
                               onClick={() => arrayHelpers.push('')} // insert an empty string at a position
-                           > + </button>
+                           >Add another playlist</button>
                         </div>
                      )}
-                  />
+                  </FieldArray>
 
-                  <Field as="select" name="target" placeholder="Select target playlist"  className="main-dropDown-dropDown">
+                  <Field
+                     as="select"
+                     name="target"
+                     placeholder="Select target playlist"
+                     id="target-select-field"
+                     className="main-dropDown-dropDown"
+                  >
                      <option value="">Select target playlist</option>
                      { playlists.map(({ id, name }) => (
                         <option key={id} value={id}>{name}</option>
@@ -74,7 +80,7 @@ export function PlaylistForm({ playlists, onSubmit, loading }: Props) {
                   <button type="submit" className="main-buttons-button main-button-outlined">Submit</button>
                </Form>
             )}
-         />
+         </Formik>
       );
    } else {
       return (

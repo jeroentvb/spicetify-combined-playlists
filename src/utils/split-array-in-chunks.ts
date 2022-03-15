@@ -1,4 +1,4 @@
-export default function splitArrayInChunks<T>(array: T[], itemsPerChunk = 100): T[][] {
+export function splitArrayInChunks<T>(array: T[], itemsPerChunk = 100): T[][] {
    return array.reduce((result, item, index) => {
       const chunkIndex = Math.floor(index / itemsPerChunk);
 

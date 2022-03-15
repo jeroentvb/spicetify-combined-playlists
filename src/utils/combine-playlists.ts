@@ -1,8 +1,7 @@
 import { ADD_TRACKS_TO_PLAYLIST_URL, TRACKS_FROM_PLAYLIST_URL_FILTER } from '../constants';
-import getPaginatedSpotifyData from './get-paginated-spotify-data';
-import splitArrayInChunks from './split-array-in-chunks';
+import { getPaginatedSpotifyData, splitArrayInChunks } from './';
 
-export default async function combinePlaylists(sourcePlaylists: SpotifyApi.PlaylistObjectSimplified[], targetPlaylist: SpotifyApi.PlaylistObjectSimplified) {
+export async function combinePlaylists(sourcePlaylists: SpotifyApi.PlaylistObjectSimplified[], targetPlaylist: SpotifyApi.PlaylistObjectSimplified) {
    const allTracksWithPossibleDuplicates = await Promise.all(sourcePlaylists.map(async (playlist) => {
       return await getPaginatedSpotifyData<{ track: { uri: string } }>(playlist.tracks.href + TRACKS_FROM_PLAYLIST_URL_FILTER)
          .then(items => items.map(item => item.track.uri));
@@ -19,5 +18,5 @@ export default async function combinePlaylists(sourcePlaylists: SpotifyApi.Playl
       await Spicetify.CosmosAsync.post(ADD_TRACKS_TO_PLAYLIST_URL(targetPlaylist.id), { uris: trackUris });
    }));
 
-   return sourcesTrackUris.length;
+   Spicetify.showNotification(`Added ${sourcesTrackUris.length} tracks to playlist: ${targetPlaylist.name}`);
 }

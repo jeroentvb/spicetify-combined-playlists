@@ -1,4 +1,4 @@
-export default async function getPaginatedSpotifyData<T = any>(url: string): Promise<T[]> {
+export async function getPaginatedSpotifyData<T = any>(url: string): Promise<T[]> {
    const res: SpotifyApi.PagingObject<T> = await Spicetify.CosmosAsync.get(url);
 
    return [

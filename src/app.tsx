@@ -1,17 +1,12 @@
 import styles from './css/app.module.scss';
 import React from 'react';
-import { PlaylistForm } from './components/Form';
-import type { SubmitEventHandler } from './components/Form';
-
-import combinePlaylists from './utils/combine-playlists';
+import { InitialPlaylistForm, PlaylistForm } from './components/Form';
+import { combinePlaylists, getPlaylistInfo, TrackLoadingState, getPaginatedSpotifyData } from './utils';
 import { GET_PLAYLISTS_URL, LS_KEY } from './constants';
 import type { CombinedPlaylist } from './types/combined-playlist';
 import type { SpotifyPlaylist } from './types/spotify-playlist';
-import getPlaylistInfo from './utils/get-playlist-info';
-import { PLAYLISTS } from './constants/playlists';
 
 import './css/styles.scss';
-import getPaginatedSpotifyData from './utils/get-paginated-spotify-data';
 
 interface State {
   playlists: SpotifyPlaylist[];
@@ -43,21 +38,16 @@ class App extends React.Component<Record<string, unknown>, State> {
 
    async componentDidMount() {
       const playlists = await getPaginatedSpotifyData<SpotifyPlaylist>(GET_PLAYLISTS_URL);
-      console.log(playlists)
-      this.setState({ playlists: PLAYLISTS });
+      this.setState({ playlists });
    }
 
-   onSubmit: SubmitEventHandler = async (formData) => {
-      this.setState({ loading: true });
-
+   @TrackLoadingState()
+   async onSubmit(formData: InitialPlaylistForm) {
       const sourcePlaylists = formData.sources.map((source) => this.findPlaylist(source));
       const targetPlaylist = this.findPlaylist(formData.target);
-      const total = await combinePlaylists(sourcePlaylists, targetPlaylist);
+      await combinePlaylists(sourcePlaylists, targetPlaylist);
       this.saveCombinedPlaylist(sourcePlaylists, targetPlaylist);
-
-      this.setState({ loading: false });
-      Spicetify.showNotification(`Combined ${total} tracks into playlist: ${targetPlaylist.name}`);
-   };
+   }
 
    saveCombinedPlaylist(sourcePlaylists: SpotifyPlaylist[], targetPlaylist: SpotifyPlaylist) {
       const combinedPlaylist: CombinedPlaylist = {
@@ -72,10 +62,13 @@ class App extends React.Component<Record<string, unknown>, State> {
       this.combinedPlaylistsLs = this.combinedPlaylistsLs.concat(combinedPlaylist);
    }
 
-   syncPlaylist(id: string) {
+   @TrackLoadingState()
+   async syncPlaylist(id: string) {
       const playlistToSync = this.findPlaylist(id);
+      const { sources } = this.state.combinedPlaylists.find((combinedPlaylist) => combinedPlaylist.target.id === playlistToSync.id) as CombinedPlaylist;
+      const sourcePlaylists = sources.map((sourcePlaylist) => this.findPlaylist(sourcePlaylist.id)) as SpotifyPlaylist[];
 
-      Spicetify.showNotification('This feature hasn\'t been implemented yet');
+      await combinePlaylists(sourcePlaylists, playlistToSync);
    }
 
    findPlaylist(id: string): SpotifyPlaylist {

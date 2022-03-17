@@ -10,14 +10,24 @@
       display: flex;
       gap: 1em;
       padding: 8px 0;
+
+      button {
+        display: flex;
+      }
     }
 
     #target-select-field {
       margin: 16px 0;
     }
 
+    #form-actions-container {
+      display: flex;
+      gap: 1em;
+    }
+
     button[type=submit] {
       background-color: var(--spice-button);
+      flex-grow: 1;
 
       &:active {
         background-color: var(--spice-button-active);
@@ -34,6 +44,7 @@
       display: flex;
       align-items: center;
       gap: 1em;
+      padding: 4px 0;
 
       p {
         flex-grow: 1;

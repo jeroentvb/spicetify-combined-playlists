@@ -5,6 +5,7 @@ export function TrackLoadingState() {
       const originalMethod = descriptor.value;
 
       descriptor.value = function(...args: unknown[]) {
+         console.log(this);
          const App = this as App;
          App.setState({ loading: true });
 

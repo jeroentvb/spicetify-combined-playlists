@@ -1,10 +1,9 @@
-import styles from './css/app.module.scss';
 import React from 'react';
-import { InitialPlaylistForm, PlaylistForm } from './components/Form';
+import type { FormikHelpers } from 'formik';
+import { PlaylistForm } from './components/Form';
 import { combinePlaylists, getPlaylistInfo, TrackLoadingState, getPaginatedSpotifyData } from './utils';
 import { GET_PLAYLISTS_URL, LS_KEY } from './constants';
-import type { CombinedPlaylist } from './types/combined-playlist';
-import type { SpotifyPlaylist } from './types/spotify-playlist';
+import type { CombinedPlaylist, SpotifyPlaylist, InitialPlaylistForm } from './types';
 
 import './css/styles.scss';
 
@@ -29,24 +28,34 @@ class App extends React.Component<Record<string, unknown>, State> {
 
       this.state = {
          playlists: [],
-         combinedPlaylists: this.combinedPlaylistsLs,
+         combinedPlaylists: [],
          loading: false,
       };
-
-      console.log(Spicetify);
    }
 
    async componentDidMount() {
       const playlists = await getPaginatedSpotifyData<SpotifyPlaylist>(GET_PLAYLISTS_URL);
-      this.setState({ playlists });
+      const combinedPlaylists = this.combinedPlaylistsLs.map((combinedPlaylist) => this.getMostRecentPlaylistFromData(combinedPlaylist, playlists));
+
+      this.setState({
+         playlists,
+         combinedPlaylists
+      });
    }
 
    @TrackLoadingState()
-   async onSubmit(formData: InitialPlaylistForm) {
+   async createNewCombinedPlaylist(formData: InitialPlaylistForm, { resetForm }: FormikHelpers<InitialPlaylistForm>) {
+      if (formData.sources.length === 0 || !formData.target) {
+         Spicetify.showNotification('Please select at least one source and one target playlist');
+         return;
+      }
+
       const sourcePlaylists = formData.sources.map((source) => this.findPlaylist(source));
       const targetPlaylist = this.findPlaylist(formData.target);
       await combinePlaylists(sourcePlaylists, targetPlaylist);
       this.saveCombinedPlaylist(sourcePlaylists, targetPlaylist);
+
+      resetForm();
    }
 
    saveCombinedPlaylist(sourcePlaylists: SpotifyPlaylist[], targetPlaylist: SpotifyPlaylist) {
@@ -66,7 +75,7 @@ class App extends React.Component<Record<string, unknown>, State> {
    async syncPlaylist(id: string) {
       const playlistToSync = this.findPlaylist(id);
       const { sources } = this.state.combinedPlaylists.find((combinedPlaylist) => combinedPlaylist.target.id === playlistToSync.id) as CombinedPlaylist;
-      const sourcePlaylists = sources.map((sourcePlaylist) => this.findPlaylist(sourcePlaylist.id)) as SpotifyPlaylist[];
+      const sourcePlaylists = sources.map((sourcePlaylist) => this.findPlaylist(sourcePlaylist.id));
 
       await combinePlaylists(sourcePlaylists, playlistToSync);
    }
@@ -75,16 +84,28 @@ class App extends React.Component<Record<string, unknown>, State> {
       return this.state.playlists.find((playlist) => playlist.id === id) as SpotifyPlaylist;
    }
 
+   // TODO gracefully handle playlists that don't exist anymore
+   getMostRecentPlaylistFromData(combinedPlaylist: CombinedPlaylist, playlists: SpotifyPlaylist[]): CombinedPlaylist {
+      const sources = combinedPlaylist.sources.map(({ id }) => playlists.find((pl) => pl.id === id) as SpotifyPlaylist);
+      const target = playlists.find((pl) => pl.id === combinedPlaylist.target.id) as SpotifyPlaylist;
+
+      return { sources, target };
+   }
+
    render() {
       if (this.state.playlists.length > 0 ) {
          return (
             <div id="combined-playlists-wrapper" className="contentSpacing">
-               <h1>Think of a cool name or somethin</h1>
+               <h1>Playlist combiner</h1>
 
                <div id="combined-playlists-content">
                   <section>
                      <h2>Create combined playlist</h2>
-                     <PlaylistForm playlists={this.state.playlists} onSubmit={this.onSubmit} loading={this.state.loading} />
+                     <PlaylistForm
+                        playlists={this.state.playlists}
+                        onSubmit={(formData, helpers) => this.createNewCombinedPlaylist(formData, helpers)}
+                        loading={this.state.loading}
+                     />
                   </section>
 
                   <section>
@@ -103,13 +124,9 @@ class App extends React.Component<Record<string, unknown>, State> {
                </div>
             </div>
          );
-      } else {
-         return (
-            <div className={styles.container}>
-               <h1>Loading...</h1>
-            </div>
-         );
       }
+
+      return '';
    }
 }
 

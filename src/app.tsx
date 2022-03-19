@@ -1,16 +1,19 @@
 import React from 'react';
-import type { FormikHelpers } from 'formik';
-import { PlaylistForm } from './components/Form';
-import { combinePlaylists, getPlaylistInfo, TrackLoadingState, getPaginatedSpotifyData } from './utils';
+import { combinePlaylists, getPlaylistInfo, getPaginatedSpotifyData, TrackState } from './utils';
 import { GET_PLAYLISTS_URL, LS_KEY } from './constants';
 import type { CombinedPlaylist, SpotifyPlaylist, InitialPlaylistForm } from './types';
 
-import './css/styles.scss';
+import './assets/css/styles.scss';
+import { Card } from './components/Card';
+import { SpicetifySvgIcon } from './components/SpicetifySvgIcon';
+import { AddPlaylistCard } from './components/AddPlaylistCard';
+import { PlaylistForm } from './components/AddPlaylistForm';
 
-interface State {
+export interface State {
   playlists: SpotifyPlaylist[];
   combinedPlaylists: CombinedPlaylist[];
-  loading: boolean;
+  isLoading: boolean;
+  isInitializing: boolean;
 }
 
 class App extends React.Component<Record<string, unknown>, State> {
@@ -29,10 +32,12 @@ class App extends React.Component<Record<string, unknown>, State> {
       this.state = {
          playlists: [],
          combinedPlaylists: [],
-         loading: false,
+         isLoading: false,
+         isInitializing: false,
       };
    }
 
+   @TrackState('isInitializing')
    async componentDidMount() {
       const playlists = await getPaginatedSpotifyData<SpotifyPlaylist>(GET_PLAYLISTS_URL);
       const combinedPlaylists = this.combinedPlaylistsLs.map((combinedPlaylist) => this.getMostRecentPlaylistFromData(combinedPlaylist, playlists));
@@ -43,19 +48,14 @@ class App extends React.Component<Record<string, unknown>, State> {
       });
    }
 
-   @TrackLoadingState()
-   async createNewCombinedPlaylist(formData: InitialPlaylistForm, { resetForm }: FormikHelpers<InitialPlaylistForm>) {
-      if (formData.sources.length === 0 || !formData.target) {
-         Spicetify.showNotification('Please select at least one source and one target playlist');
-         return;
-      }
-
+   @TrackState('isLoading')
+   async createNewCombinedPlaylist(formData: InitialPlaylistForm) {
       const sourcePlaylists = formData.sources.map((source) => this.findPlaylist(source));
       const targetPlaylist = this.findPlaylist(formData.target);
       await combinePlaylists(sourcePlaylists, targetPlaylist);
       this.saveCombinedPlaylist(sourcePlaylists, targetPlaylist);
 
-      resetForm();
+      Spicetify.PopupModal.hide();
    }
 
    saveCombinedPlaylist(sourcePlaylists: SpotifyPlaylist[], targetPlaylist: SpotifyPlaylist) {
@@ -64,15 +64,26 @@ class App extends React.Component<Record<string, unknown>, State> {
          target: getPlaylistInfo(targetPlaylist),
       };
 
-      this.setState((state) => ({
-         combinedPlaylists: state.combinedPlaylists.concat(combinedPlaylist),
-      }));
+      const index = this.state.combinedPlaylists.findIndex(({ target }) => target.id === combinedPlaylist.target.id);
+      let newCombinedPlaylists: CombinedPlaylist[];
 
-      this.combinedPlaylistsLs = this.combinedPlaylistsLs.concat(combinedPlaylist);
+      if (index >= 0) {
+         newCombinedPlaylists = this.state.combinedPlaylists;
+         newCombinedPlaylists[index] = combinedPlaylist;
+      } else {
+         newCombinedPlaylists = this.state.combinedPlaylists.concat(combinedPlaylist);
+      }
+
+      this.setState({
+         combinedPlaylists: newCombinedPlaylists,
+      });
+
+      this.combinedPlaylistsLs = newCombinedPlaylists;
    }
 
-   @TrackLoadingState()
+   @TrackState('isLoading')
    async syncPlaylist(id: string) {
+      console.log('sync');
       const playlistToSync = this.findPlaylist(id);
       const { sources } = this.state.combinedPlaylists.find((combinedPlaylist) => combinedPlaylist.target.id === playlistToSync.id) as CombinedPlaylist;
       const sourcePlaylists = sources.map((sourcePlaylist) => this.findPlaylist(sourcePlaylist.id));
@@ -92,41 +103,52 @@ class App extends React.Component<Record<string, unknown>, State> {
       return { sources, target };
    }
 
+   showAddPlaylistModal() {
+      const Form = <PlaylistForm playlists={this.state.playlists} onSubmit={this.createNewCombinedPlaylist.bind(this)} />;
+
+      Spicetify.PopupModal.display({
+         title: 'Create combined playlist',
+         content: Form,
+         isLarge: true,
+      });
+   }
+
+   openCombinedPlaylistModal() {
+      // Spicetify.PopupModal.display({
+
+      // })
+   }
+
    render() {
-      if (this.state.playlists.length > 0 ) {
-         return (
-            <div id="combined-playlists-wrapper" className="contentSpacing">
+      return (
+         <div id="combined-playlists--wrapper" className="contentSpacing">
+            <header>
                <h1>Playlist combiner</h1>
+               <button onClick={() => this.showAddPlaylistModal()}><SpicetifySvgIcon iconName="plus2px" /></button>
+            </header>
 
-               <div id="combined-playlists-content">
-                  <section>
-                     <h2>Create combined playlist</h2>
-                     <PlaylistForm
-                        playlists={this.state.playlists}
-                        onSubmit={(formData, helpers) => this.createNewCombinedPlaylist(formData, helpers)}
-                        loading={this.state.loading}
-                     />
-                  </section>
+            {!this.state.isInitializing && <div id="combined-playlists--grid" className="main-gridContainer-gridContainer">
+               {this.state.combinedPlaylists.map((combinedPlaylist) => {
+                  const playlist = this.findPlaylist(combinedPlaylist.target.id);
 
-                  <section>
-                     <h2>Combined playlists</h2>
-                     {this.state.combinedPlaylists.map(({ target: { name, id } }) => (
-                        <div key={id} className="combined-playlist">
-                           <p>{name}</p>
-                           <button
-                              className='main-buttons-button main-button-outlined'
-                              type="button"
-                              onClick={() => this.syncPlaylist(id)}
-                           >Sync</button>
-                        </div>
-                     ))}
-                  </section>
+                  return <Card
+                     key={playlist.id}
+                     playlist={playlist}
+                     onClick={this.openCombinedPlaylistModal.bind(this)}
+                     onClickAction={() => !this.state.isLoading && this.syncPlaylist(playlist.id)}
+                  />;
+               })}
+               <AddPlaylistCard onClick={() => this.showAddPlaylistModal()} />
+            </div>}
+
+            {/* {Object.keys(Spicetify.SVGIcons).map((key) => (
+               <div key={key}>
+                  <SpicetifySvgIcon iconName={key} />
+                  <p>{key}</p>
                </div>
-            </div>
-         );
-      }
-
-      return '';
+            ))} */}
+         </div>
+      );
    }
 }
 

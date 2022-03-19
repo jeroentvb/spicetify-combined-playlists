@@ -1,0 +1,104 @@
+#combined-playlists-wrapper {
+  display: flex;
+  flex-direction: column;
+
+  #combined-playlists-content {
+    display: grid;
+    grid-template-columns: 1fr 0.6fr;
+    gap: 2em;
+
+    .combined-playlist {
+      display: flex;
+      align-items: center;
+      gap: 1em;
+      padding: 4px 0;
+
+      p {
+        flex-grow: 1;
+      }
+    }
+  }
+}
+
+#combined-playlists--wrapper {
+  header {
+    display: flex;
+
+    h1 {
+      flex-grow: 1;
+    }
+
+    button {
+      border-radius: 8px;
+      color: var(--spice-text);
+      cursor: pointer;
+      border: none;
+      height: 48px;
+      width: 48px;
+      background-color: var(--spice-sidebar);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      &:hover {
+        background-color: var(--spice-tab-active);
+      }
+    }
+  }
+
+  #combined-playlists--grid {
+    --minimumColumnWidth: 180px;
+    // display: grid;
+    // grid-template-columns: repeat(4, 1fr);
+
+    .action-button__wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .action-button-icon__wrapper {
+        position: unset;
+      }
+    }
+  }
+}
+
+#create-combined-playlist-form {
+  display: flex;
+  flex-direction: column;
+
+  .select-wrapper {
+    display: flex;
+    gap: 1em;
+    padding: 8px 0;
+
+    button {
+      display: flex;
+    }
+  }
+
+  #target-select-field {
+    margin: 16px 0;
+  }
+
+  .error-msg {
+    margin-bottom: 8px;
+    color: var(--spice-notification-error);
+  }
+
+  #form-actions-container {
+    display: flex;
+    gap: 1em;
+    margin: 1em 0;
+  }
+
+  button[type=submit] {
+    background-color: var(--spice-button);
+    color: black;
+    flex-grow: 1;
+
+    &:active {
+      background-color: var(--spice-button-active);
+    }
+  }
+}

@@ -115,7 +115,7 @@ class App extends React.Component<Record<string, unknown>, State> {
       });
    }
 
-   openCombinedPlaylistModal(combinedPlaylist: CombinedPlaylist) {
+   openEditPlaylistModal(combinedPlaylist: CombinedPlaylist) {
       const formValues: InitialPlaylistForm = {
          target: combinedPlaylist.target.id,
          sources: combinedPlaylist.sources.map((source) => source.id)
@@ -148,7 +148,7 @@ class App extends React.Component<Record<string, unknown>, State> {
                   return <Card
                      key={playlist.id}
                      playlist={playlist}
-                     onClick={() => this.openCombinedPlaylistModal(combinedPlaylist)}
+                     onClick={() => this.openEditPlaylistModal(combinedPlaylist)}
                      onClickAction={() => !this.state.isLoading && this.syncPlaylist(playlist.id)}
                   />;
                })}

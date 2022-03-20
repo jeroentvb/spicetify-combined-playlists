@@ -58,6 +58,9 @@ class App extends React.Component<Record<string, unknown>, State> {
       Spicetify.PopupModal.hide();
    }
 
+   /**
+    * Save combined playlist to localstorage and state. Making sure not to create a duplicate
+    */
    saveCombinedPlaylist(sourcePlaylists: SpotifyPlaylist[], targetPlaylist: SpotifyPlaylist) {
       const combinedPlaylist: CombinedPlaylist = {
          sources: sourcePlaylists.map(getPlaylistInfo),
@@ -83,7 +86,6 @@ class App extends React.Component<Record<string, unknown>, State> {
 
    @TrackState('isLoading')
    async syncPlaylist(id: string) {
-      console.log('sync');
       const playlistToSync = this.findPlaylist(id);
       const { sources } = this.state.combinedPlaylists.find((combinedPlaylist) => combinedPlaylist.target.id === playlistToSync.id) as CombinedPlaylist;
       const sourcePlaylists = sources.map((sourcePlaylist) => this.findPlaylist(sourcePlaylist.id));
@@ -113,10 +115,22 @@ class App extends React.Component<Record<string, unknown>, State> {
       });
    }
 
-   openCombinedPlaylistModal() {
-      // Spicetify.PopupModal.display({
+   openCombinedPlaylistModal(combinedPlaylist: CombinedPlaylist) {
+      const formValues: InitialPlaylistForm = {
+         target: combinedPlaylist.target.id,
+         sources: combinedPlaylist.sources.map((source) => source.id)
+      };
+      const Form = <PlaylistForm
+         playlists={this.state.playlists}
+         onSubmit={this.createNewCombinedPlaylist.bind(this)}
+         initialForm={formValues}
+      />;
 
-      // })
+      Spicetify.PopupModal.display({
+         title: 'Edit combined playlist',
+         content: Form,
+         isLarge: true,
+      });
    }
 
    render() {
@@ -134,19 +148,12 @@ class App extends React.Component<Record<string, unknown>, State> {
                   return <Card
                      key={playlist.id}
                      playlist={playlist}
-                     onClick={this.openCombinedPlaylistModal.bind(this)}
+                     onClick={() => this.openCombinedPlaylistModal(combinedPlaylist)}
                      onClickAction={() => !this.state.isLoading && this.syncPlaylist(playlist.id)}
                   />;
                })}
                <AddPlaylistCard onClick={() => this.showAddPlaylistModal()} />
             </div>}
-
-            {/* {Object.keys(Spicetify.SVGIcons).map((key) => (
-               <div key={key}>
-                  <SpicetifySvgIcon iconName={key} />
-                  <p>{key}</p>
-               </div>
-            ))} */}
          </div>
       );
    }

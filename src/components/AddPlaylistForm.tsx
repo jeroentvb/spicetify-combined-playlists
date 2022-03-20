@@ -7,15 +7,17 @@ import type { InitialPlaylistForm } from '../types/initial-playlist-form';
 interface Props {
    playlists: SpotifyApi.PlaylistObjectSimplified[];
    onSubmit: SubmitEventHandler;
+   initialForm?: InitialPlaylistForm
 }
 
 export type SubmitEventHandler = (form : InitialPlaylistForm) => void
 
-export function PlaylistForm({ playlists, onSubmit }: Props) {
-   const initialPlaylistForm: InitialPlaylistForm = {
-      target: '',
-      sources: ['', '']
-   };
+const initialPlaylistForm: InitialPlaylistForm = {
+   target: '',
+   sources: ['', '']
+};
+
+export function PlaylistForm({ playlists, onSubmit, initialForm = initialPlaylistForm }: Props) {
 
    const validationFn = (form: InitialPlaylistForm) => {
       const errors: Record<string, unknown> = {};
@@ -32,7 +34,7 @@ export function PlaylistForm({ playlists, onSubmit }: Props) {
 
    return (
       <Formik
-         initialValues={initialPlaylistForm}
+         initialValues={initialForm}
          onSubmit={onSubmit}
          validate={validationFn}
       >
@@ -92,7 +94,9 @@ export function PlaylistForm({ playlists, onSubmit }: Props) {
                         type="button"
                         onClick={() => sourcesFieldHelpers.push('')} // insert an empty string at a position
                      >Add another playlist</button>
-                     <button type="submit" className="main-buttons-button main-button-outlined">{isSubmitting ? 'Loading..' : 'Submit'}</button>
+                     <button type="submit" className="main-buttons-button main-button-outlined">
+                        {isSubmitting ? 'Loading..' : (initialForm.target ? 'Save' : 'Submit')}
+                     </button>
                   </div>
                </fieldset>
             </Form>

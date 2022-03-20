@@ -51,6 +51,13 @@
     // display: grid;
     // grid-template-columns: repeat(4, 1fr);
 
+    .main-card-card {
+      button {
+        background-color: transparent;
+        border: none;
+      }
+    }
+
     .action-button__wrapper {
       display: flex;
       align-items: center;

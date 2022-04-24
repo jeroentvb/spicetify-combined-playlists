@@ -21,6 +21,25 @@
 }
 
 #combined-playlists--wrapper {
+  --grid-gap: 24px;
+  --column-count: 3;
+
+  @media (min-width: 1300px) {
+    --column-count: 4;
+  }
+
+  @media (min-width: 1500px) {
+    --column-count: 5;
+  }
+
+  @media (min-width: 1700px) {
+    --column-count: 6;
+  }
+
+  @media (min-width: 1900px) {
+    --column-count: 7;
+  }
+
   header {
     display: flex;
 
@@ -58,13 +77,52 @@
       }
     }
 
+    .action-button__button {
+      box-sizing: border-box;
+      font-family: var(--font-family,spotify-circular),Helvetica,Arial,sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      font-size: 1rem;
+      line-height: 1.5rem;
+      font-weight: 700;
+      background-color: transparent;
+      border: 0px;
+      border-radius: 500px;
+      display: inline-block;
+      position: relative;
+      text-align: center;
+      text-decoration: none;
+      text-transform: none;
+      touch-action: manipulation;
+      transition-duration: 33ms;
+      transition-property: background-color, border-color, color, box-shadow, filter, transform;
+      user-select: none;
+      vertical-align: middle;
+      transform: translate3d(0px, 0px, 0px);
+      padding: 0px;
+      min-inline-size: 0px;
+      align-self: center;
+    }
+
     .action-button__wrapper {
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      position: relative;
+      background-color: var(--background-base,#1ed760);
+      color: var(--text-base,#000000);
+      border-radius: 500px;
+      font-size: inherit;
+      inline-size: 48px;
+      block-size: 48px;
+
+      // display: flex;
+      // align-items: center;
+      // justify-content: center;
 
       .action-button-icon__wrapper {
-        position: unset;
+        display: flex;
+        position: absolute;
+        top: 12px;
+        left: 12px;
+
+        // position: unset;
       }
     }
   }

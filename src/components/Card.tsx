@@ -28,7 +28,7 @@ export function Card({ playlist, onClick, onClickAction }: CardProps) {
                </div>
 
                <div onClick={handleActionClick}  className="main-card-PlayButtonContainer">
-                  <button aria-label="Synchronize combined playlist" className="Button-qlcn5g-0 flgROw">
+                  <button aria-label="Synchronize combined playlist" className="action-button__button Button-qlcn5g-0 flgROw">
                      <div className="action-button__wrapper ButtonInner-sc-14ud5tc-0 cSeieV encore-bright-accent-set">
                         <span aria-hidden="true" className="action-button-icon__wrapper IconWrapper__Wrapper-sc-1hf1hjl-0 jWeDTW">
                            <SpicetifySvgIcon iconName="repeat" />

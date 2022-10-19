@@ -1,0 +1,10 @@
+{
+   "name": "Playlist combiner",
+   "description": "Combine 2 or more playlist into a new playlist.",
+   "preview": "docs/create.png",
+   "readme": "README.md",
+   "branch": "dist",
+   "authors": [
+       { "name": "jeroentvb", "url": "https://github.com/jeroentvb" }
+   ]
+}

@@ -58,9 +58,13 @@ export function PlaylistForm({ playlists, onSubmit, initialForm = initialPlaylis
                                        </Field>
 
                                        {values.sources.length > 1 && <button
-                                          className='main-buttons-button main-button-outlined'
+                                          className='main-buttons-button main-button-outlined btn__remove-playlist'
                                           type="button"
-                                          onClick={() => arrayHelpers.remove(index)}
+                                          onClick={(e) => {
+                                             e.preventDefault();
+                                             e.stopPropagation();
+                                             arrayHelpers.remove(index);
+                                          }}
                                           name="Remove playlist"
                                        >
                                           <SpicetifySvgIcon iconName="x" size={16} />

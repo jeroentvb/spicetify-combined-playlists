@@ -1,3 +1,16 @@
+@mixin button {
+  border-radius: 500px;
+  padding: 16px;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: transform 0.2s ease-out;
+
+  &:hover {
+    cursor: pointer;
+    transform: scale(1.025);
+  }
+}
+
 #combined-playlists-wrapper {
   display: flex;
   flex-direction: column;
@@ -136,6 +149,7 @@
     display: flex;
     gap: 1em;
     padding: 8px 0;
+    align-items: center;
 
     button {
       display: flex;
@@ -157,10 +171,37 @@
     margin: 1em 0;
   }
 
+  .btn {
+    &__add-playlist {
+      @include button;
+      background-color: var(--spice-player);
+      border: 1px solid var(--spice-misc);
+      color: var(--spice-text);
+
+      &:hover {
+        border-color: var(--spice-text);
+      }
+    }
+
+    &__remove-playlist {
+      @include button;
+      background-color: var(--spice-player);
+      border: 1px solid var(--spice-misc);
+      padding: 8px 16px;
+
+      &:hover {
+        border-color: var(--spice-text);
+      }
+    }
+  }
+
   button[type=submit] {
     background-color: var(--spice-button);
     color: black;
     flex-grow: 1;
+    border: none;
+
+    @include button;
 
     &:active {
       background-color: var(--spice-button-active);

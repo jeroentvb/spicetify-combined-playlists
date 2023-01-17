@@ -9,6 +9,8 @@ export interface CardProps {
 }
 
 export function Card({ playlist, onClick, onClickAction }: CardProps) {
+   console.log('playlist data', playlist);
+
    const handleCardClick: React.MouseEventHandler<HTMLDivElement> = (e) => {
       e.stopPropagation();
       onClick?.();
@@ -24,7 +26,7 @@ export function Card({ playlist, onClick, onClickAction }: CardProps) {
          <div className="main-card-draggable" draggable="true">
             <div className="main-card-imageContainer">
                <div className="main-cardImage-imageWrapper">
-                  <div className=""><img aria-hidden="false" draggable="false" loading="lazy" src={playlist.images[0].url} alt="" className="main-image-image main-cardImage-image" /></div>
+                  <div className=""><img aria-hidden="false" draggable="false" loading="lazy" src={playlist.images[0]?.url} alt="" className="main-image-image main-cardImage-image" /></div>
                </div>
 
                <div onClick={handleActionClick}  className="main-card-PlayButtonContainer">

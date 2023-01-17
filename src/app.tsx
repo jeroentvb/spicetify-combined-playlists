@@ -87,6 +87,7 @@ class App extends React.Component<Record<string, unknown>, State> {
    @TrackState('isLoading')
    async syncPlaylist(id: string) {
       const playlistToSync = this.findPlaylist(id);
+      Spicetify.showNotification(`Synchronizing playlist: ${playlistToSync.name}`);
       const { sources } = this.state.combinedPlaylists.find((combinedPlaylist) => combinedPlaylist.target.id === playlistToSync.id) as CombinedPlaylist;
       const sourcePlaylists = sources.map((sourcePlaylist) => this.findPlaylist(sourcePlaylist.id));
 
@@ -148,11 +149,11 @@ class App extends React.Component<Record<string, unknown>, State> {
                   return <Card
                      key={playlist.id}
                      playlist={playlist}
-                     onClick={() => this.openEditPlaylistModal(combinedPlaylist)}
+                     onClick={() => !this.state.isLoading && this.openEditPlaylistModal(combinedPlaylist)}
                      onClickAction={() => !this.state.isLoading && this.syncPlaylist(playlist.id)}
                   />;
                })}
-               <AddPlaylistCard onClick={() => this.showAddPlaylistModal()} />
+               <AddPlaylistCard onClick={() => !this.state.isLoading && this.showAddPlaylistModal()} />
             </div>}
          </div>
       );

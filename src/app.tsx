@@ -1,13 +1,14 @@
 import React from 'react';
 import { combinePlaylists, getPlaylistInfo, getPaginatedSpotifyData, TrackState } from './utils';
-import { GET_PLAYLISTS_URL, LS_KEY } from './constants';
+import { CREATE_NEW_PLAYLIST_IDENTIFIER, CREATE_PLAYLIST_URL, GET_PLAYLISTS_URL, LS_KEY } from './constants';
 import type { CombinedPlaylist, SpotifyPlaylist, InitialPlaylistForm } from './types';
 
 import './assets/css/styles.scss';
-import { Card } from './components/Card';
 import { SpicetifySvgIcon } from './components/SpicetifySvgIcon';
-import { AddPlaylistCard } from './components/AddPlaylistCard';
 import { PlaylistForm } from './components/AddPlaylistForm';
+import { AddPlaylistCard } from './components/AddPlaylistCard';
+import { Card } from './components/Card';
+import { ImportExportModal } from './components/ImportExportModal';
 
 export interface State {
   playlists: SpotifyPlaylist[];
@@ -41,21 +42,50 @@ class App extends React.Component<Record<string, unknown>, State> {
    async componentDidMount() {
       const playlists = await getPaginatedSpotifyData<SpotifyPlaylist>(GET_PLAYLISTS_URL);
       const combinedPlaylists = this.combinedPlaylistsLs.map((combinedPlaylist) => this.getMostRecentPlaylistFromData(combinedPlaylist, playlists));
+      const checkedCombinedPlaylists = this.checkIfPlaylistsAreStillValid(combinedPlaylists);
 
       this.setState({
          playlists,
-         combinedPlaylists
+         combinedPlaylists: checkedCombinedPlaylists
       });
+   }
+
+   checkIfPlaylistsAreStillValid(combinedPlaylists: CombinedPlaylist[]) {
+      const validPlaylists = combinedPlaylists.filter(({ target }) => target?.id);
+
+      if (validPlaylists.length !== combinedPlaylists.length) {
+         this.combinedPlaylistsLs = validPlaylists;
+      }
+
+      return validPlaylists;
    }
 
    @TrackState('isLoading')
    async createNewCombinedPlaylist(formData: InitialPlaylistForm) {
       const sourcePlaylists = formData.sources.map((source) => this.findPlaylist(source));
-      const targetPlaylist = this.findPlaylist(formData.target);
+      const targetPlaylist = formData.target === CREATE_NEW_PLAYLIST_IDENTIFIER
+         ? await this.createPlaylist(formData.sources)
+         : this.findPlaylist(formData.target);
+
       await combinePlaylists(sourcePlaylists, targetPlaylist);
       this.saveCombinedPlaylist(sourcePlaylists, targetPlaylist);
 
       Spicetify.PopupModal.hide();
+   }
+
+   async createPlaylist(sources: string[]) {
+      const { username }: { username: string } = await Spicetify.Platform.UserAPI.getUser();
+      const sourcePlaylistNames = sources.map((source) => this.findPlaylist(source).name);
+
+      const newPlaylist = await Spicetify.CosmosAsync.post(CREATE_PLAYLIST_URL(username), {
+         name: 'Combined Playlist',
+         description: `Combined playlist from ${sourcePlaylistNames.join(', ')}.`,
+         public: false,
+      });
+
+      this.setState((state) => ({ playlists: [...state.playlists, newPlaylist ] }));
+
+      return newPlaylist;
    }
 
    /**
@@ -87,6 +117,7 @@ class App extends React.Component<Record<string, unknown>, State> {
    @TrackState('isLoading')
    async syncPlaylist(id: string) {
       const playlistToSync = this.findPlaylist(id);
+      Spicetify.showNotification(`Synchronizing playlist: ${playlistToSync.name}`);
       const { sources } = this.state.combinedPlaylists.find((combinedPlaylist) => combinedPlaylist.target.id === playlistToSync.id) as CombinedPlaylist;
       const sourcePlaylists = sources.map((sourcePlaylist) => this.findPlaylist(sourcePlaylist.id));
 
@@ -133,26 +164,47 @@ class App extends React.Component<Record<string, unknown>, State> {
       });
    }
 
+   openImportExportModal() {
+      const importCombinedPlaylists = (combinedPlaylistsData: string) => {
+         const combinedPlaylists = JSON.parse(combinedPlaylistsData);
+         const safeCombinedPlaylists = this.checkIfPlaylistsAreStillValid(combinedPlaylists.map((combinedPlaylist: CombinedPlaylist) => this.getMostRecentPlaylistFromData(combinedPlaylist, this.state.playlists)));
+
+         this.setState({ combinedPlaylists: safeCombinedPlaylists });
+
+         this.combinedPlaylistsLs = safeCombinedPlaylists;
+
+         Spicetify.showNotification('Imported combined playlists successfully!');
+         Spicetify.PopupModal.hide();
+      };
+
+      Spicetify.PopupModal.display({
+         title: 'Import / export combined playlists',
+         content: <ImportExportModal combinedPlaylists={this.state.combinedPlaylists} importCombinedPlaylists={importCombinedPlaylists} />,
+         isLarge: true,
+      });
+   }
+
    render() {
       return (
          <div id="combined-playlists--wrapper" className="contentSpacing">
             <header>
                <h1>Playlist combiner</h1>
+               <button onClick={() => this.openImportExportModal()}><SpicetifySvgIcon iconName="external-link" /></button>
                <button onClick={() => this.showAddPlaylistModal()}><SpicetifySvgIcon iconName="plus2px" /></button>
             </header>
 
             {!this.state.isInitializing && <div id="combined-playlists--grid" className="main-gridContainer-gridContainer">
-               {this.state.combinedPlaylists.map((combinedPlaylist) => {
+               {this.state.combinedPlaylists.map((combinedPlaylist, i) => {
                   const playlist = this.findPlaylist(combinedPlaylist.target.id);
 
                   return <Card
                      key={playlist.id}
                      playlist={playlist}
-                     onClick={() => this.openEditPlaylistModal(combinedPlaylist)}
+                     onClick={() => !this.state.isLoading && this.openEditPlaylistModal(combinedPlaylist)}
                      onClickAction={() => !this.state.isLoading && this.syncPlaylist(playlist.id)}
                   />;
                })}
-               <AddPlaylistCard onClick={() => this.showAddPlaylistModal()} />
+               <AddPlaylistCard onClick={() => !this.state.isLoading && this.showAddPlaylistModal()} />
             </div>}
          </div>
       );

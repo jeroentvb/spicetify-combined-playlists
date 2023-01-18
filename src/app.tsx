@@ -8,6 +8,7 @@ import { SpicetifySvgIcon } from './components/SpicetifySvgIcon';
 import { PlaylistForm } from './components/AddPlaylistForm';
 import { AddPlaylistCard } from './components/AddPlaylistCard';
 import { Card } from './components/Card';
+import { ImportExportModal } from './components/ImportExportModal';
 
 export interface State {
   playlists: SpotifyPlaylist[];
@@ -163,11 +164,32 @@ class App extends React.Component<Record<string, unknown>, State> {
       });
    }
 
+   openImportExportModal() {
+      const importCombinedPlaylists = (combinedPlaylistsData: string) => {
+         const combinedPlaylists = JSON.parse(combinedPlaylistsData);
+         const safeCombinedPlaylists = this.checkIfPlaylistsAreStillValid(combinedPlaylists.map((combinedPlaylist: CombinedPlaylist) => this.getMostRecentPlaylistFromData(combinedPlaylist, this.state.playlists)));
+
+         this.setState({ combinedPlaylists: safeCombinedPlaylists });
+
+         this.combinedPlaylistsLs = safeCombinedPlaylists;
+
+         Spicetify.showNotification('Imported combined playlists successfully!');
+         Spicetify.PopupModal.hide();
+      };
+
+      Spicetify.PopupModal.display({
+         title: 'Import / export combined playlists',
+         content: <ImportExportModal combinedPlaylists={this.state.combinedPlaylists} importCombinedPlaylists={importCombinedPlaylists} />,
+         isLarge: true,
+      });
+   }
+
    render() {
       return (
          <div id="combined-playlists--wrapper" className="contentSpacing">
             <header>
                <h1>Playlist combiner</h1>
+               <button onClick={() => this.openImportExportModal()}><SpicetifySvgIcon iconName="external-link" /></button>
                <button onClick={() => this.showAddPlaylistModal()}><SpicetifySvgIcon iconName="plus2px" /></button>
             </header>
 

@@ -71,6 +71,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      margin-left: 1rem;
 
       &:hover {
         background-color: var(--spice-tab-active);
@@ -171,30 +172,6 @@
     margin: 1em 0;
   }
 
-  .btn {
-    &__add-playlist {
-      @include button;
-      background-color: var(--spice-player);
-      border: 1px solid var(--spice-misc);
-      color: var(--spice-text);
-
-      &:hover {
-        border-color: var(--spice-text);
-      }
-    }
-
-    &__remove-playlist {
-      @include button;
-      background-color: var(--spice-player);
-      border: 1px solid var(--spice-misc);
-      padding: 8px 16px;
-
-      &:hover {
-        border-color: var(--spice-text);
-      }
-    }
-  }
-
   button[type=submit] {
     background-color: var(--spice-button);
     color: black;
@@ -205,6 +182,62 @@
 
     &:active {
       background-color: var(--spice-button-active);
+    }
+  }
+}
+
+.btn {
+  &__add-playlist {
+    @include button;
+    background-color: var(--spice-player);
+    border: 1px solid var(--spice-misc);
+    color: var(--spice-text);
+
+    &:hover {
+      border-color: var(--spice-text);
+    }
+  }
+
+  &__remove-playlist {
+    @include button;
+    background-color: var(--spice-player);
+    border: 1px solid var(--spice-misc);
+    padding: 8px 16px;
+
+    &:hover {
+      border-color: var(--spice-text);
+    }
+  }
+
+  &__import-export {
+    @include button;
+    background-color: var(--spice-player);
+    border: 1px solid var(--spice-misc);
+    padding: 8px 16px;
+
+    &:hover {
+      border-color: var(--spice-text);
+    }
+  }
+}
+
+#import-export-modal {
+  .export-form {
+    margin-top: 0.5em;
+    margin-bottom: 1em;
+  }
+
+  .import-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+
+    textarea {
+      border-radius: 6px;
+      resize: vertical;
+      color: var(--spice-text);
+      background-color: var(--spice-misc);
+      padding: 1em;
     }
   }
 }

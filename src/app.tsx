@@ -4,10 +4,10 @@ import { GET_PLAYLISTS_URL, LS_KEY } from './constants';
 import type { CombinedPlaylist, SpotifyPlaylist, InitialPlaylistForm } from './types';
 
 import './assets/css/styles.scss';
-import { Card } from './components/Card';
 import { SpicetifySvgIcon } from './components/SpicetifySvgIcon';
-import { AddPlaylistCard } from './components/AddPlaylistCard';
 import { PlaylistForm } from './components/AddPlaylistForm';
+import { AddPlaylistCard } from './components/AddPlaylistCard';
+import { Card } from './components/Card';
 
 export interface State {
   playlists: SpotifyPlaylist[];
@@ -41,11 +41,22 @@ class App extends React.Component<Record<string, unknown>, State> {
    async componentDidMount() {
       const playlists = await getPaginatedSpotifyData<SpotifyPlaylist>(GET_PLAYLISTS_URL);
       const combinedPlaylists = this.combinedPlaylistsLs.map((combinedPlaylist) => this.getMostRecentPlaylistFromData(combinedPlaylist, playlists));
+      const checkedCombinedPlaylists = this.checkIfPlaylistsAreStillValid(combinedPlaylists);
 
       this.setState({
          playlists,
-         combinedPlaylists
+         combinedPlaylists: checkedCombinedPlaylists
       });
+   }
+
+   checkIfPlaylistsAreStillValid(combinedPlaylists: CombinedPlaylist[]) {
+      const validPlaylists = combinedPlaylists.filter(({ target }) => target?.id);
+
+      if (validPlaylists.length !== combinedPlaylists.length) {
+         this.combinedPlaylistsLs = validPlaylists;
+      }
+
+      return validPlaylists;
    }
 
    @TrackState('isLoading')

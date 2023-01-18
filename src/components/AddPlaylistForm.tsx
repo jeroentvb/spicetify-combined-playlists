@@ -3,6 +3,7 @@ import type { FieldArrayRenderProps } from 'formik';
 import React from 'react';
 import { SpicetifySvgIcon } from './SpicetifySvgIcon';
 import type { InitialPlaylistForm } from '../types/initial-playlist-form';
+import { CREATE_NEW_PLAYLIST_IDENTIFIER } from '../constants';
 
 interface Props {
    playlists: SpotifyApi.PlaylistObjectSimplified[];
@@ -13,7 +14,7 @@ interface Props {
 export type SubmitEventHandler = (form : InitialPlaylistForm) => void
 
 const initialPlaylistForm: InitialPlaylistForm = {
-   target: '',
+   target: CREATE_NEW_PLAYLIST_IDENTIFIER,
    sources: ['', '']
 };
 
@@ -85,7 +86,7 @@ export function PlaylistForm({ playlists, onSubmit, initialForm = initialPlaylis
                      id="target-select-field"
                      className="main-dropDown-dropDown"
                   >
-                     <option value="">Select target playlist</option>
+                     <option value={CREATE_NEW_PLAYLIST_IDENTIFIER}>Create new playlist</option>
                      { playlists.map(({ id, name }) => (
                         <option key={id} value={id}>{name}</option>
                      )) }

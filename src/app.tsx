@@ -1,6 +1,6 @@
 import React from 'react';
 import { combinePlaylists, getPlaylistInfo, getPaginatedSpotifyData, TrackState } from './utils';
-import { GET_PLAYLISTS_URL, LS_KEY } from './constants';
+import { CREATE_NEW_PLAYLIST_IDENTIFIER, CREATE_PLAYLIST_URL, GET_PLAYLISTS_URL, LS_KEY } from './constants';
 import type { CombinedPlaylist, SpotifyPlaylist, InitialPlaylistForm } from './types';
 
 import './assets/css/styles.scss';
@@ -62,11 +62,29 @@ class App extends React.Component<Record<string, unknown>, State> {
    @TrackState('isLoading')
    async createNewCombinedPlaylist(formData: InitialPlaylistForm) {
       const sourcePlaylists = formData.sources.map((source) => this.findPlaylist(source));
-      const targetPlaylist = this.findPlaylist(formData.target);
+      const targetPlaylist = formData.target === CREATE_NEW_PLAYLIST_IDENTIFIER
+         ? await this.createPlaylist(formData.sources)
+         : this.findPlaylist(formData.target);
+
       await combinePlaylists(sourcePlaylists, targetPlaylist);
       this.saveCombinedPlaylist(sourcePlaylists, targetPlaylist);
 
       Spicetify.PopupModal.hide();
+   }
+
+   async createPlaylist(sources: string[]) {
+      const { username }: { username: string } = await Spicetify.Platform.UserAPI.getUser();
+      const sourcePlaylistNames = sources.map((source) => this.findPlaylist(source).name);
+
+      const newPlaylist = await Spicetify.CosmosAsync.post(CREATE_PLAYLIST_URL(username), {
+         name: 'Combined Playlist',
+         description: `Combined playlist from ${sourcePlaylistNames.join(', ')}.`,
+         public: false,
+      });
+
+      this.setState((state) => ({ playlists: [...state.playlists, newPlaylist ] }));
+
+      return newPlaylist;
    }
 
    /**
@@ -154,7 +172,7 @@ class App extends React.Component<Record<string, unknown>, State> {
             </header>
 
             {!this.state.isInitializing && <div id="combined-playlists--grid" className="main-gridContainer-gridContainer">
-               {this.state.combinedPlaylists.map((combinedPlaylist) => {
+               {this.state.combinedPlaylists.map((combinedPlaylist, i) => {
                   const playlist = this.findPlaylist(combinedPlaylist.target.id);
 
                   return <Card

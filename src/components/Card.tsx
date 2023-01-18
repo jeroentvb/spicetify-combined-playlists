@@ -9,8 +9,6 @@ export interface CardProps {
 }
 
 export function Card({ playlist, onClick, onClickAction }: CardProps) {
-   console.log('playlist data', playlist);
-
    const handleCardClick: React.MouseEventHandler<HTMLDivElement> = (e) => {
       e.stopPropagation();
       onClick?.();

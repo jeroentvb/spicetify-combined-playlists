@@ -12,7 +12,7 @@ The app currently allows combining playlist into one playlists and synchronizing
 </details>
 
 ## Installation
-Copy the [combined-playlists](https://github.com/jeroentvb/spicetify-combined-playlists/tree/dist) folder to the spicetify CustomApps folder located in:
+Copy the [combined-playlists](https://github.com/jeroentvb/spicetify-combined-playlists/tree/dist) folder from the [dist branch](https://github.com/jeroentvb/spicetify-combined-playlists/tree/dist) to the spicetify CustomApps folder located in:
 | **Platform**    | **Path**                               |
 |-----------------|----------------------------------------|
 | **MacOs/Linux** | `~/.config/spicetify/CustomApps`       |

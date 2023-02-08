@@ -16,7 +16,7 @@ Copy the [combined-playlists](https://github.com/jeroentvb/spicetify-combined-pl
 | **Platform**    | **Path**                               |
 |-----------------|----------------------------------------|
 | **MacOs/Linux** | `~/.config/spicetify/CustomApps`       |
-| **Windows**     | `%userprofile%/.spicetify/CustomApps/` |
+| **Windows**     | `%appdata%\spicetify\CustomApps\`      |
 
 Then, run the following commands:
 ```sh

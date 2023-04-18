@@ -51,11 +51,11 @@ class App extends React.Component<Record<string, unknown>, State> {
    }
 
    checkIfPlaylistsAreStillValid(combinedPlaylists: CombinedPlaylist[]) {
-      const validPlaylists = combinedPlaylists.filter(({ target }) => target?.id);
+      const validPlaylists = combinedPlaylists
+         .filter(({ target }) => target?.id) // Check if target playlist still exists
+         .map((pl) => ({ ...pl, sources: pl.sources.filter(Boolean)})); // Check if source playlists still exist
 
-      if (validPlaylists.length !== combinedPlaylists.length) {
-         this.combinedPlaylistsLs = validPlaylists;
-      }
+      this.combinedPlaylistsLs = validPlaylists;
 
       return validPlaylists;
    }
@@ -128,7 +128,6 @@ class App extends React.Component<Record<string, unknown>, State> {
       return this.state.playlists.find((playlist) => playlist.id === id) as SpotifyPlaylist;
    }
 
-   // TODO gracefully handle playlists that don't exist anymore
    getMostRecentPlaylistFromData(combinedPlaylist: CombinedPlaylist, playlists: SpotifyPlaylist[]): CombinedPlaylist {
       const sources = combinedPlaylist.sources.map(({ id }) => playlists.find((pl) => pl.id === id) as SpotifyPlaylist);
       const target = playlists.find((pl) => pl.id === combinedPlaylist.target.id) as SpotifyPlaylist;
@@ -194,7 +193,7 @@ class App extends React.Component<Record<string, unknown>, State> {
             </header>
 
             {!this.state.isInitializing && <div id="combined-playlists--grid" className="main-gridContainer-gridContainer">
-               {this.state.combinedPlaylists.map((combinedPlaylist, i) => {
+               {this.state.combinedPlaylists.map((combinedPlaylist) => {
                   const playlist = this.findPlaylist(combinedPlaylist.target.id);
 
                   return <Card

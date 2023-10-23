@@ -12,6 +12,7 @@ export const GET_PLAYLIST_TRACKS_URL = (uri: string) => `sp://core-playlist/v1/p
 export const ADD_TRACKS_TO_PLAYLIST_URL = (id: string) => `https://api.spotify.com/v1/playlists/${id}/tracks`;
 
 export const LS_KEY = 'combined-playlists';
+export const LS_KEY_SETTINGS = 'combined-playlists-settings';
 
 export const CREATE_PLAYLIST_URL = (userId: string) => `https://api.spotify.com/v1/users/${userId}/playlists`;
 

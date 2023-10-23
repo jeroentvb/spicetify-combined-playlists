@@ -1,13 +1,14 @@
 import { GET_PLAYLIST_TRACKS_URL, LS_KEY } from '../constants';
 import type { CombinedPlaylist, PlaylistRowsResponse } from '../types';
-import { addTracksToPlaylist } from '../utils';
+import { addTracksToPlaylist, getCombinedPlaylistsSettings } from '../utils';
 
 (async () => {
    while (!Spicetify?.Platform || !Spicetify?.CosmosAsync) {
       await new Promise(resolve => setTimeout(resolve, 100));
    }
 
-   synchronizeCombinedPlaylists();
+   const autoSync = getCombinedPlaylistsSettings().autoSync;
+   if (autoSync) synchronizeCombinedPlaylists();
 })();
 
 export function synchronizeCombinedPlaylists() {

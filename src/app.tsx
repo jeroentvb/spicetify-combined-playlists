@@ -1,7 +1,7 @@
 import React from 'react';
-import { combinePlaylists, getPlaylistInfo, getPaginatedSpotifyData, TrackState } from './utils';
+import { combinePlaylists, getPlaylistInfo, getPaginatedSpotifyData, TrackState, setCombinedPlaylistsSettings, getCombinedPlaylistsSettings } from './utils';
 import { CREATE_NEW_PLAYLIST_IDENTIFIER, CREATE_PLAYLIST_URL, GET_PLAYLISTS_URL, LIKED_SONGS_PLAYLIST_FACADE, LS_KEY } from './constants';
-import type { CombinedPlaylist, SpotifyPlaylist, InitialPlaylistForm } from './types';
+import type { CombinedPlaylist, SpotifyPlaylist, InitialPlaylistForm, CombinedPlaylistsSettings } from './types';
 
 import './assets/css/styles.scss';
 import { SpicetifySvgIcon } from './components/SpicetifySvgIcon';
@@ -9,13 +9,18 @@ import { PlaylistForm } from './components/AddPlaylistForm';
 import { AddPlaylistCard } from './components/AddPlaylistCard';
 import { Card } from './components/Card';
 import { ImportExportModal } from './components/ImportExportModal';
+import { synchronizeCombinedPlaylists } from './extensions/auto-sync';
 
 export interface State {
   playlists: SpotifyPlaylist[];
   combinedPlaylists: CombinedPlaylist[];
   isLoading: boolean;
   isInitializing: boolean;
+  autoSync: boolean;
 }
+
+// Needs to be deinfed to avoid eslint error
+const SpotifyComponents = Spicetify.ReactComponent;
 
 class App extends React.Component<Record<string, unknown>, State> {
 
@@ -30,11 +35,14 @@ class App extends React.Component<Record<string, unknown>, State> {
    constructor(props: Record<string, unknown>) {
       super(props);
 
+      const settings = getCombinedPlaylistsSettings();
+
       this.state = {
          playlists: [],
          combinedPlaylists: [],
          isLoading: false,
          isInitializing: false,
+         autoSync: settings.autoSync,
       };
    }
 
@@ -182,13 +190,55 @@ class App extends React.Component<Record<string, unknown>, State> {
       });
    }
 
+   toggleAutoSuync() {
+      const newSettings: CombinedPlaylistsSettings = {
+         ...getCombinedPlaylistsSettings(),
+         autoSync: !this.state.autoSync,
+      };
+
+      this.setState({ autoSync: newSettings.autoSync });
+      setCombinedPlaylistsSettings(newSettings);
+   }
+
    render() {
+      const menuWrapper = (<SpotifyComponents.Menu>
+         <SpotifyComponents.MenuItem
+            label="Import / export combined playlists"
+            leadingIcon={<SpicetifySvgIcon iconName="external-link" />}
+            onClick={() => this.openImportExportModal()}
+         >
+            Import / export
+         </SpotifyComponents.MenuItem>
+         <SpotifyComponents.MenuItem
+            label="Toggle auto sync"
+            leadingIcon={<SpicetifySvgIcon iconName="repeat" />}
+            onClick={() => this.toggleAutoSuync()}
+         >
+            {this.state.autoSync ? 'Disable auto sync' : 'Enable auto sync'}
+         </SpotifyComponents.MenuItem>
+         <SpotifyComponents.MenuItem
+            label="Synchronize all combined playlists"
+            leadingIcon={<SpicetifySvgIcon iconName="repeat-once" />}
+            onClick={() => {
+               synchronizeCombinedPlaylists();
+               Spicetify.showNotification('Synchronizing all combined playlists');
+            }}
+         >
+            Synchronize all
+         </SpotifyComponents.MenuItem>
+      </SpotifyComponents.Menu>);
+
       return (
          <div id="combined-playlists--wrapper" className="contentSpacing">
             <header>
                <h1>Playlist combiner</h1>
-               <button onClick={() => this.openImportExportModal()}><SpicetifySvgIcon iconName="external-link" /></button>
                <button onClick={() => this.showAddPlaylistModal()}><SpicetifySvgIcon iconName="plus2px" /></button>
+               <SpotifyComponents.ContextMenu
+                  trigger="click"
+                  menu={menuWrapper}
+               >
+                  <button><SpicetifySvgIcon iconName="more" /></button>
+               </SpotifyComponents.ContextMenu>
             </header>
 
             {!this.state.isInitializing && <div id="combined-playlists--grid" className="main-gridContainer-gridContainer">

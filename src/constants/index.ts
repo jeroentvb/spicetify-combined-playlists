@@ -7,6 +7,8 @@ export const GET_PLAYLISTS_URL = 'https://api.spotify.com/v1/me/playlists?limit=
  */
 export const TRACKS_FROM_PLAYLIST_URL_FILTER = '?fields=items(track(uri)),next';
 
+export const GET_PLAYLIST_TRACKS_URL = (uri: string) => `sp://core-playlist/v1/playlist/${uri}/rows`;
+
 export const ADD_TRACKS_TO_PLAYLIST_URL = (id: string) => `https://api.spotify.com/v1/playlists/${id}/tracks`;
 
 export const LS_KEY = 'combined-playlists';
@@ -16,7 +18,7 @@ export const CREATE_PLAYLIST_URL = (userId: string) => `https://api.spotify.com/
 export const CREATE_NEW_PLAYLIST_IDENTIFIER = 'CREATE_NEW_PLAYLIST_IDENTIFIER';
 
 export const LIKED_SONGS_PLAYLIST_FACADE: SpotifyPlaylist = {
-   name: Spicetify.Platform.Translations['shared.library.entity-row.liked-songs.title'],
+   name: Spicetify.Platform?.Translations['shared.library.entity-row.liked-songs.title'],
    collaborative: false,
    description: '',
    external_urls: { spotify: '' },

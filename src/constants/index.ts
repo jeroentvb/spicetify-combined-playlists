@@ -9,6 +9,8 @@ export const TRACKS_FROM_PLAYLIST_URL_FILTER = '?fields=items(track(uri)),next';
 
 export const GET_PLAYLIST_TRACKS_URL = (uri: string) => `sp://core-playlist/v1/playlist/${uri}/rows`;
 
+export const GET_LIKED_SONGS_LIST_URL = 'sp://core-collection/unstable/@/list/tracks/all?responseFormat=protobufJson';
+
 export const ADD_TRACKS_TO_PLAYLIST_URL = (id: string) => `https://api.spotify.com/v1/playlists/${id}/tracks`;
 
 export const LS_KEY = 'combined-playlists';
@@ -42,5 +44,4 @@ export const LIKED_SONGS_PLAYLIST_FACADE: SpotifyPlaylist = {
    },
    type: 'playlist',
    uri: 'spotify:playlist:liked-songs-facade'
-
 };

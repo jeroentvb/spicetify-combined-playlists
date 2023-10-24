@@ -75,7 +75,11 @@ class App extends React.Component<Record<string, unknown>, State> {
          ? await this.createPlaylist(formData.sources)
          : this.findPlaylist(formData.target);
 
-      await combinePlaylists(sourcePlaylists, targetPlaylist);
+      await combinePlaylists(sourcePlaylists, targetPlaylist)
+         .catch((err) => {
+            console.error('An error ocurred while combining playlists', err);
+            Spicetify.showNotification('An error ocurred while combining playlists', true);
+         });
       this.saveCombinedPlaylist(sourcePlaylists, targetPlaylist);
 
       Spicetify.PopupModal.hide();
@@ -128,7 +132,17 @@ class App extends React.Component<Record<string, unknown>, State> {
       const { sources } = this.state.combinedPlaylists.find((combinedPlaylist) => combinedPlaylist.target.id === playlistToSync.id) as CombinedPlaylist;
       const sourcePlaylists = sources.map((sourcePlaylist) => this.findPlaylist(sourcePlaylist.id));
 
-      await combinePlaylists(sourcePlaylists, playlistToSync);
+      await combinePlaylists(sourcePlaylists, playlistToSync)
+         .catch((err) => {
+            console.error('An error ocurred while syncing playlists', err);
+            Spicetify.showNotification('An error ocurred while syncing playlists', true);
+         });
+   }
+
+   @TrackState('isLoading')
+   async syncAllPlaylists() {
+      Spicetify.showNotification('Synchronizing all combined playlists');
+      await synchronizeCombinedPlaylists();
    }
 
    findPlaylist(id: string): SpotifyPlaylist {
@@ -219,10 +233,7 @@ class App extends React.Component<Record<string, unknown>, State> {
          <SpotifyComponents.MenuItem
             label="Synchronize all combined playlists"
             leadingIcon={<SpicetifySvgIcon iconName="repeat-once" />}
-            onClick={() => {
-               synchronizeCombinedPlaylists();
-               Spicetify.showNotification('Synchronizing all combined playlists');
-            }}
+            onClick={() => !this.state.isLoading && this.syncAllPlaylists()}
          >
             Synchronize all
          </SpotifyComponents.MenuItem>

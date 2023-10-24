@@ -1,6 +1,9 @@
 # Playlist combiner
 Ever wanted to combine your spotify playlists into one big one? This Spicetify custom app is able to do just that.  
-The app currently allows combining playlist into one playlists and synchronizing them with the press of a button after adding songs to one of the source playlists. The ultimate goal is to add the songs from the source to the target automatically. But that's still w.i.p.
+
+### Features
+* Combine multiple playlists into one
+* Auto sync to add missing tracks when spotify starts
 
 ![combined playlists home page](docs/home.png)
 
@@ -34,6 +37,3 @@ Playlists may also be added or removed via the edit modal. Removing a playlist d
 ```
 ⚠️ Combining a large amount of songs into a playlist may take some time
 ```
-
-## Todo
-See the [issues](https://github.com/jeroentvb/spicetify-combined-playlists/issues) tab.

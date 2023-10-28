@@ -1,6 +1,6 @@
 import { LS_KEY } from '../constants';
 import type { CombinedPlaylist } from '../types';
-import { combinePlaylists, getCombinedPlaylistsSettings } from '../utils';
+import { combinePlaylists, getCombinedPlaylistsSettings, playlistCache } from '../utils';
 
 (async () => {
    while (!Spicetify?.Platform || !Spicetify?.CosmosAsync) {
@@ -18,5 +18,6 @@ export function synchronizeCombinedPlaylists() {
       .catch((err) => {
          console.error('An error ocurred while auto-syncing playlists', err);
          Spicetify.showNotification('An error ocurred while auto-syncing playlists', true);
-      });
+      })
+      .finally(() => playlistCache.clear());
 }

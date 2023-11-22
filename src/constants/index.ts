@@ -45,3 +45,7 @@ export const LIKED_SONGS_PLAYLIST_FACADE: SpotifyPlaylist = {
    type: 'playlist',
    uri: 'spotify:playlist:liked-songs-facade'
 };
+
+export const RELEASES_URL = 'https://api.github.com/repos/jeroentvb/spicetify-combined-playlists/releases';
+
+export const DIST_URL = 'https://github.com/jeroentvb/spicetify-combined-playlists/tree/dist';

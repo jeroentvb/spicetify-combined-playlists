@@ -1,6 +1,6 @@
 {
   "name": "combined-playlists",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "private": true,
   "scripts": {
     "build": "spicetify-creator",
@@ -21,6 +21,7 @@
     "spicetify-creator": "^1.0.10"
   },
   "dependencies": {
-    "formik": "^2.2.9"
+    "formik": "^2.2.9",
+    "semver": "^7.5.4"
   }
 }

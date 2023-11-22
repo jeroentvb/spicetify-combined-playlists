@@ -241,3 +241,27 @@
     }
   }
 }
+
+#new-update-banner {
+   background-color: var(--spice-selected-row);
+   padding: 1em;
+   border-radius: 0.5em;
+   color: var(--spice-tab-active);
+   margin-bottom: 1em;
+   display: flex;
+   align-items: center;
+
+   h3 {
+      flex-grow: 1;
+   }
+
+   a {
+      @include button;
+      color: var(--spice-tab-active);
+      background-color: var(--spice-button);
+
+      &:hover {
+         text-decoration: none;
+      }
+   }
+}

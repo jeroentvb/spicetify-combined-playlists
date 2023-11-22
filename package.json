@@ -21,6 +21,7 @@
     "spicetify-creator": "^1.0.10"
   },
   "dependencies": {
-    "formik": "^2.2.9"
+    "formik": "^2.2.9",
+    "semver": "^7.5.4"
   }
 }

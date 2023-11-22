@@ -10,6 +10,7 @@ import { AddPlaylistCard } from './components/AddPlaylistCard';
 import { Card } from './components/Card';
 import { ImportExportModal } from './components/ImportExportModal';
 import { synchronizeCombinedPlaylists } from './extensions/auto-sync';
+import { UpdateBanner } from './components/UpdateBanner';
 
 export interface State {
   playlists: SpotifyPlaylist[];
@@ -241,6 +242,7 @@ class App extends React.Component<Record<string, unknown>, State> {
 
       return (
          <div id="combined-playlists--wrapper" className="contentSpacing">
+            <UpdateBanner />
             <header>
                <h1>Playlist combiner</h1>
                <button onClick={() => this.showAddPlaylistModal()}><SpicetifySvgIcon iconName="plus2px" /></button>

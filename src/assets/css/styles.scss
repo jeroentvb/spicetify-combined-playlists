@@ -37,6 +37,8 @@
   --grid-gap: 24px;
   --column-count: 3;
 
+  padding: 2rem;
+
   @media (min-width: 1300px) {
     --column-count: 4;
   }
@@ -80,7 +82,7 @@
   }
 
   #combined-playlists--grid {
-    --minimumColumnWidth: 180px;
+    --min-column-width: 180px;
     // display: grid;
     // grid-template-columns: repeat(4, 1fr);
 

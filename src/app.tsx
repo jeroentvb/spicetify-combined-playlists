@@ -57,6 +57,10 @@ class App extends React.Component<Record<string, unknown>, State> {
          playlists,
          combinedPlaylists: checkedCombinedPlaylists
       });
+
+      // Remove new top bar if it exists, because it interferes with the layout
+      const topBarContent = document.querySelector<HTMLHeadingElement>('.main-topBar-container');
+      if (topBarContent) topBarContent.style.display = 'none';
    }
 
    checkIfPlaylistsAreStillValid(combinedPlaylists: CombinedPlaylist[]) {
@@ -242,17 +246,19 @@ class App extends React.Component<Record<string, unknown>, State> {
 
       return (
          <div id="combined-playlists--wrapper" className="contentSpacing">
-            <UpdateBanner />
-            <header>
-               <h1>Playlist combiner</h1>
-               <button onClick={() => this.showAddPlaylistModal()}><SpicetifySvgIcon iconName="plus2px" /></button>
-               <SpotifyComponents.ContextMenu
-                  trigger="click"
-                  menu={menuWrapper}
-               >
-                  <button><SpicetifySvgIcon iconName="more" /></button>
-               </SpotifyComponents.ContextMenu>
-            </header>
+            <div id="combined-playlists--header-content">
+               <UpdateBanner />
+               <header>
+                  <h1>Playlist combiner</h1>
+                  <button onClick={() => this.showAddPlaylistModal()}><SpicetifySvgIcon iconName="plus2px" /></button>
+                  <SpotifyComponents.ContextMenu
+                     trigger="click"
+                     menu={menuWrapper}
+                  >
+                     <button><SpicetifySvgIcon iconName="more" /></button>
+                  </SpotifyComponents.ContextMenu>
+               </header>
+            </div>
 
             {!this.state.isInitializing && <div id="combined-playlists--grid" className="main-gridContainer-gridContainer">
                {this.state.combinedPlaylists.map((combinedPlaylist) => {

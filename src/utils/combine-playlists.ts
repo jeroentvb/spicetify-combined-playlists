@@ -8,8 +8,8 @@ export const playlistCache = new Map<string, string[]>();
 export async function combinePlaylists(sourcePlaylists: PlaylistInfo[], targetPlaylist: PlaylistInfo, autoSync = false) {
    const sourceUris = await Promise.all(sourcePlaylists.map(async (playlist): Promise<string[]> => {
       if (playlist.id === LIKED_SONGS_PLAYLIST_FACADE.id) {
-         return Spicetify.CosmosAsync.get(GET_LIKED_SONGS_LIST_URL)
-            .then((res: SpotifyCollectionCallResponse) => res.item.map(item => item.trackMetadata.link));
+         const res = await Spicetify.Platform.LibraryAPI.getTracks();
+         return extractTrackUris(res);
       } else {
          return getPlaylistTracksWithCache(playlist.uri);
       }
@@ -46,9 +46,20 @@ async function getPlaylistTracksWithCache(uri: string) {
    if (cachedPlaylistTracks) {
       return Promise.resolve(cachedPlaylistTracks);
    } else {
-      const tracks = await Spicetify.CosmosAsync.get(GET_PLAYLIST_TRACKS_URL(uri))
-         .then((res: PlaylistRowsResponse) => res.rows.map((row) => row.link));
+      const res = await Spicetify.Platform.PlaylistAPI.getContents(uri);
+      const tracks = extractTrackUris(res.items);
       playlistCache.set(uri, tracks);
       return tracks;
    }
+}
+
+function extractTrackUris(items: any[]): string[] {
+   return items.reduce((acc: string[], item: any) => {
+      const track = item.track || item;
+      const uri = track.uri || track.entity?.uri;
+      if (uri?.startsWith("spotify:track:") && (track.isPlayable ?? true)) {
+         acc.push(uri);
+      }
+      return acc;
+   }, []);
 }

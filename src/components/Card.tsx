@@ -24,7 +24,11 @@ export function Card({ playlist, onClick, onClickAction }: CardProps) {
          <div className="main-card-draggable" draggable="true">
             <div className="main-card-imageContainer">
                <div className="main-cardImage-imageWrapper">
-                  <div className=""><img aria-hidden="false" draggable="false" loading="lazy" src={playlist.images[0]?.url} alt="" className="main-image-image main-cardImage-image" /></div>
+                  {
+                     playlist.images?.[0]?.url
+                        ? <div><img aria-hidden="false" draggable="false" loading="lazy" src={playlist.images[0].url} alt="" className="main-image-image main-cardImage-image" /></div>
+                        : <SpicetifySvgIcon iconName="playlist" classes="playlist-fallback-icon" />
+                  }
                </div>
 
                <div onClick={handleActionClick}  className="main-card-PlayButtonContainer">

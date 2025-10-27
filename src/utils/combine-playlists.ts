@@ -1,4 +1,4 @@
-import { ADD_TRACKS_TO_PLAYLIST_URL, LIKED_SONGS_PLAYLIST_FACADE } from '../constants';
+import { LIKED_SONGS_PLAYLIST_FACADE } from '../constants';
 import { PlaylistInfo, PlaylistContentsResponse } from '../types';
 import { splitArrayInChunks } from './';
 
@@ -25,20 +25,26 @@ export async function combinePlaylists(sourcePlaylists: PlaylistInfo[], targetPl
       Spicetify.showNotification(`Auto-syncing ${missingUris.length} missing tracks to playlist ${targetPlaylist.name}`);
    }
 
-   await Promise.all(uriChunks.map((trackUris) => {
-      return addTracksToPlaylist(targetPlaylist.id, trackUris);
-   }));
+   await Promise.all(uriChunks.map(async (trackUris) => {
+      return addTracksToPlaylist(targetPlaylist.uri, trackUris).then(() => {
+         // Update cache
+         const existingUris = playlistCache.get(targetPlaylist.uri) || [];
+         playlistCache.set(targetPlaylist.uri, [...existingUris, ...trackUris]);
+      });
+   }));   
 
    if (missingUris.length > 0) {
       const msg = autoSync
          ? `Auto-synced ${missingUris.length} missing tracks to playlist ${targetPlaylist.name} 🔥`
          : `Added ${missingUris.length} tracks to playlist: ${targetPlaylist.name}`;
       Spicetify.showNotification(msg);
+   } else if (!autoSync) {
+      Spicetify.showNotification(`${targetPlaylist.name} is already up to date! 🎉`);
    }
 }
 
-export function addTracksToPlaylist(playlistId: string, trackUris: string[]) {
-   return Spicetify.CosmosAsync.post(ADD_TRACKS_TO_PLAYLIST_URL(playlistId), { uris: trackUris });
+export function addTracksToPlaylist(playlistUri: string, trackUris: string[]): Promise<void> {
+   return Spicetify.Platform.PlaylistAPI.add(playlistUri, trackUris, {});
 }
 
 async function getPlaylistTracksWithCache(uri: string) {

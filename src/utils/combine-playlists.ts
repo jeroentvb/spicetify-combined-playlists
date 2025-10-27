@@ -1,5 +1,5 @@
-import { ADD_TRACKS_TO_PLAYLIST_URL, GET_LIKED_SONGS_LIST_URL, GET_PLAYLIST_TRACKS_URL, LIKED_SONGS_PLAYLIST_FACADE } from '../constants';
-import { PlaylistInfo, PlaylistRowsResponse, SpotifyCollectionCallResponse } from '../types';
+import { ADD_TRACKS_TO_PLAYLIST_URL, LIKED_SONGS_PLAYLIST_FACADE } from '../constants';
+import { PlaylistInfo, PlaylistContentsResponse } from '../types';
 import { splitArrayInChunks } from './';
 
 // Cache used when fetching playlist tracks to avoid unnecessary API calls
@@ -8,8 +8,8 @@ export const playlistCache = new Map<string, string[]>();
 export async function combinePlaylists(sourcePlaylists: PlaylistInfo[], targetPlaylist: PlaylistInfo, autoSync = false) {
    const sourceUris = await Promise.all(sourcePlaylists.map(async (playlist): Promise<string[]> => {
       if (playlist.id === LIKED_SONGS_PLAYLIST_FACADE.id) {
-         return Spicetify.CosmosAsync.get(GET_LIKED_SONGS_LIST_URL)
-            .then((res: SpotifyCollectionCallResponse) => res.item.map(item => item.trackMetadata.link));
+         const res: PlaylistContentsResponse = await Spicetify.Platform.LibraryAPI.getTracks({ limit: 99999 });
+         return extractTrackUris(res.items);
       } else {
          return getPlaylistTracksWithCache(playlist.uri);
       }
@@ -46,9 +46,15 @@ async function getPlaylistTracksWithCache(uri: string) {
    if (cachedPlaylistTracks) {
       return Promise.resolve(cachedPlaylistTracks);
    } else {
-      const tracks = await Spicetify.CosmosAsync.get(GET_PLAYLIST_TRACKS_URL(uri))
-         .then((res: PlaylistRowsResponse) => res.rows.map((row) => row.link));
+      const res: PlaylistContentsResponse = await Spicetify.Platform.PlaylistAPI.getContents(uri);
+      const tracks = extractTrackUris(res.items);
       playlistCache.set(uri, tracks);
       return tracks;
    }
+}
+
+function extractTrackUris(items: PlaylistContentsResponse['items']): string[] {
+   return items
+      .filter((item) => item.uri?.startsWith("spotify:track:") && item.isPlayable)
+      .map((item) => item.uri);
 }

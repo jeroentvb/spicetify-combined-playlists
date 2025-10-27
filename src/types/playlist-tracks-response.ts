@@ -1,5 +1,6 @@
-export interface PlaylistRowsResponse {
-   rows: {
-      link: string
-   }[]
+export interface PlaylistContentsResponse {
+   items: {
+      uri: string;
+      isPlayable?: boolean;
+   }[];
 }

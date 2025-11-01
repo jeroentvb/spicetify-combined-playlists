@@ -2,13 +2,14 @@
   "name": "combined-playlists",
   "version": "1.5.2",
   "private": true,
-  "type": "module",
   "scripts": {
     "build": "spicetify-creator",
     "build:local": "spicetify-creator --out=dist/combined-playlists --minify",
     "build:prod": "npm run build:local && npm run copy:docs",
     "copy:docs": "copyfiles README.md docs/* dist/combined-playlists",
-    "watch": "spicetify-creator --watch"
+    "watch": "spicetify-creator --watch",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix"
   },
   "license": "MIT",
   "devDependencies": {

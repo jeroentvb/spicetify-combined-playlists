@@ -2,14 +2,14 @@ import js from '@eslint/js';
 import { includeIgnoreFile } from '@eslint/compat';
 import globals from 'globals';
 import { fileURLToPath } from 'node:url';
-import ts from 'typescript-eslint';
 import jeroentvbEslintConfig from '@jeroentvb/eslint-config-typescript';
 import react from 'eslint-plugin-react';
+import { defineConfig } from 'eslint/config';
 
 const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url));
 
 /** @type {import("eslint").Linter.Config[]} */
-export default ts.config(
+export default defineConfig(
    includeIgnoreFile(gitignorePath),
    js.configs.recommended,
    // ...ts.configs.recommended,
@@ -42,5 +42,8 @@ export default ts.config(
       //    // see: https://typescript-eslint.io/troubleshooting/faqs/eslint/#i-get-errors-from-the-no-undef-rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
       //    'no-undef': 'off'
       // }
+   },
+   {
+      ignores: ['**/*.d.ts'],
    }
 );

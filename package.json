@@ -7,18 +7,25 @@
     "build:local": "spicetify-creator --out=dist/combined-playlists --minify",
     "build:prod": "npm run build:local && npm run copy:docs",
     "copy:docs": "copyfiles README.md docs/* dist/combined-playlists",
-    "watch": "spicetify-creator --watch"
+    "watch": "spicetify-creator --watch",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix"
   },
   "license": "MIT",
   "devDependencies": {
-    "@jeroentvb/eslint-config-typescript": "^1.3.2",
+    "@eslint/compat": "^1.4.1",
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.39.0",
+    "@jeroentvb/eslint-config-typescript": "^9.0.2",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
+    "@types/semver": "^7.7.1",
     "@types/spotify-api": "^0.0.25",
     "copyfiles": "^2.4.1",
-    "eslint": "^8.9.0",
+    "eslint": "^9.39.0",
     "eslint-plugin-react": "^7.28.0",
-    "spicetify-creator": "^1.0.17"
+    "spicetify-creator": "^1.0.17",
+    "typescript-eslint": "^8.46.2"
   },
   "dependencies": {
     "formik": "^2.4.6",

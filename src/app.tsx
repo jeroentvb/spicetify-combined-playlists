@@ -13,11 +13,11 @@ import { synchronizeCombinedPlaylists } from './extensions/auto-sync';
 import { UpdateBanner } from './components/UpdateBanner';
 
 export interface State {
-  playlists: SpotifyPlaylist[];
-  combinedPlaylists: CombinedPlaylist[];
-  isLoading: boolean;
-  isInitializing: boolean;
-  autoSync: boolean;
+   playlists: SpotifyPlaylist[];
+   combinedPlaylists: CombinedPlaylist[];
+   isLoading: boolean;
+   isInitializing: boolean;
+   autoSync: boolean;
 }
 
 // Needs to be deinfed to avoid eslint error

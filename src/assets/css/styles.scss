@@ -152,7 +152,7 @@
   }
 }
 
-#create-combined-playlist-form {
+#create-combined-playlist-form, #combined-playlists-confirm-dialog {
   display: flex;
   flex-direction: column;
 
@@ -182,10 +182,9 @@
     margin: 1em 0;
   }
 
-  button[type=submit] {
+  button[type=submit], .btn__confirm {
     background-color: var(--spice-button);
     color: black;
-    flex-grow: 1;
     border: none;
 
     @include button;
@@ -193,6 +192,14 @@
     &:active {
       background-color: var(--spice-button-active);
     }
+  }
+
+  button[type=submit] {
+    flex-grow: 1;
+  }
+
+  .form-actions__confirm button {
+      flex-grow: 1;
   }
 }
 

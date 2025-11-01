@@ -4,21 +4,25 @@ import React from 'react';
 import { SpicetifySvgIcon } from './SpicetifySvgIcon';
 import type { InitialPlaylistForm } from '../types/initial-playlist-form';
 import { CREATE_NEW_PLAYLIST_IDENTIFIER } from '../constants';
+import { TrashIcon } from './TrashIcon';
 
 interface Props {
    playlists: SpotifyApi.PlaylistObjectSimplified[];
    onSubmit: SubmitEventHandler;
-   initialForm?: InitialPlaylistForm
+   onDelete?: DeleteEventHandler;
+   initialForm?: InitialPlaylistForm;
+   isNew?: boolean;
 }
 
 export type SubmitEventHandler = (form : InitialPlaylistForm) => void;
+export type DeleteEventHandler = () => void;
 
 const initialPlaylistForm: InitialPlaylistForm = {
    target: CREATE_NEW_PLAYLIST_IDENTIFIER,
    sources: ['', '']
 };
 
-export function PlaylistForm({ playlists, onSubmit, initialForm = initialPlaylistForm }: Props) {
+export function PlaylistForm({ playlists, onSubmit, onDelete, initialForm = initialPlaylistForm, isNew = true }: Props) {
 
    const validationFn = (form: InitialPlaylistForm) => {
       const errors: Record<string, unknown> = {};
@@ -42,12 +46,13 @@ export function PlaylistForm({ playlists, onSubmit, initialForm = initialPlaylis
          {({ values, isSubmitting }) => (
             <Form id="create-combined-playlist-form">
                <fieldset disabled={isSubmitting}>
+                  <h3>Source playlists</h3>
                   <FieldArray name="sources">
                      {(arrayHelpers) => {
                         sourcesFieldHelpers = arrayHelpers;
 
                         return (
-                           <div>
+                           <div style={{ 'marginBottom': '1rem' }}>
                               {values.sources && values.sources.length > 0 ? (
                                  values.sources.map((_source, index) => (
                                     <div key={index} className="select-wrapper">
@@ -79,6 +84,7 @@ export function PlaylistForm({ playlists, onSubmit, initialForm = initialPlaylis
                   </FieldArray>
                   <ErrorMsg name="sources" />
 
+                  <h3>Target playlist</h3>
                   <Field
                      as="select"
                      name="target"
@@ -102,6 +108,17 @@ export function PlaylistForm({ playlists, onSubmit, initialForm = initialPlaylis
                      <button type="submit" className="main-buttons-button main-button-outlined">
                         {isSubmitting ? 'Loading..' : (initialForm.target ? 'Save' : 'Submit')}
                      </button>
+
+                     { !isNew
+                        ? <button
+                           type="button"
+                           className="main-buttons-button main-button-outlined btn__add-playlist"
+                           onClick={() => onDelete?.()}
+                        >
+                           <TrashIcon />
+                        </button>
+                        : null
+                     }
                   </div>
                </fieldset>
             </Form>

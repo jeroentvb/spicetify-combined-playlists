@@ -11,6 +11,7 @@ import { Card } from './components/Card';
 import { ImportExportModal } from './components/ImportExportModal';
 import { synchronizeCombinedPlaylists } from './extensions/auto-sync';
 import { UpdateBanner } from './components/UpdateBanner';
+import { ConfirmDialog } from './components/ConfirmDialog';
 
 export interface State {
    playlists: SpotifyPlaylist[];
@@ -131,6 +132,31 @@ class App extends React.Component<Record<string, unknown>, State> {
       this.combinedPlaylistsLs = newCombinedPlaylists;
    }
 
+   deleteCombinedPlaylist(playlist: CombinedPlaylist) {
+      const confirmDeleteCombinedPlaylist = () => {
+         const newCombinedPlaylists = this.state.combinedPlaylists.filter((pl) => pl.target.id !== playlist.target.id);
+
+         this.setState({
+            combinedPlaylists: newCombinedPlaylists,
+         });
+
+         this.combinedPlaylistsLs = newCombinedPlaylists;
+      };
+
+      Spicetify.PopupModal.display({
+         title: 'Delete combined playlist',
+         content: <ConfirmDialog
+            confirmMsg="Are you sure you want to delete this combined playlist? This will not delete the actual Spotify playlist."
+            onConfirm={() => {
+               confirmDeleteCombinedPlaylist();
+               Spicetify.PopupModal.hide();
+            }}
+            onCancel={() => Spicetify.PopupModal.hide()}
+         />,
+         isLarge: true,
+      });
+   }
+
    @TrackState('isLoading')
    async syncPlaylist(id: string) {
       const playlistToSync = this.findPlaylist(id);
@@ -179,7 +205,12 @@ class App extends React.Component<Record<string, unknown>, State> {
       const Form = <PlaylistForm
          playlists={this.state.playlists}
          onSubmit={this.createNewCombinedPlaylist.bind(this)}
+         onDelete={() => {
+            Spicetify.PopupModal.hide();
+            setTimeout(() => this.deleteCombinedPlaylist(combinedPlaylist), 50);
+         }}
          initialForm={formValues}
+         isNew={false}
       />;
 
       Spicetify.PopupModal.display({

@@ -11,7 +11,7 @@ interface Props {
    initialForm?: InitialPlaylistForm
 }
 
-export type SubmitEventHandler = (form : InitialPlaylistForm) => void
+export type SubmitEventHandler = (form : InitialPlaylistForm) => void;
 
 const initialPlaylistForm: InitialPlaylistForm = {
    target: CREATE_NEW_PLAYLIST_IDENTIFIER,

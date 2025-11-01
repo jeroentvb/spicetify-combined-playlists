@@ -3,9 +3,9 @@ import type { SpotifyPlaylist } from '../types';
 import { SpicetifySvgIcon } from './SpicetifySvgIcon';
 
 export interface CardProps {
-    playlist: SpotifyPlaylist;
-    onClickAction?: () => void;
-    onClick?: () => void;
+   playlist: SpotifyPlaylist;
+   onClickAction?: () => void;
+   onClick?: () => void;
 }
 
 export function Card({ playlist, onClick, onClickAction }: CardProps) {

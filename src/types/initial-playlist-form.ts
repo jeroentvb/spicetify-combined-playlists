@@ -1,4 +1,4 @@
 export interface InitialPlaylistForm {
-  target: string,
-  sources: string[]
+   target: string,
+   sources: string[]
 }

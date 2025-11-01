@@ -2,8 +2,8 @@ import React, { useRef } from 'react';
 import type { CombinedPlaylist } from '../types/combined-playlist';
 
 export interface ImportExportModalProps {
-  combinedPlaylists: CombinedPlaylist[];
-  importCombinedPlaylists: (combinedPlaylistsData: string) => void;
+   combinedPlaylists: CombinedPlaylist[];
+   importCombinedPlaylists: (combinedPlaylistsData: string) => void;
 }
 
 export function ImportExportModal({ combinedPlaylists, importCombinedPlaylists }: ImportExportModalProps) {

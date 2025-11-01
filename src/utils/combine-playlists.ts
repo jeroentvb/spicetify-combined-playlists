@@ -31,7 +31,7 @@ export async function combinePlaylists(sourcePlaylists: PlaylistInfo[], targetPl
          const existingUris = playlistCache.get(targetPlaylist.uri) || [];
          playlistCache.set(targetPlaylist.uri, [...existingUris, ...trackUris]);
       });
-   }));   
+   }));
 
    if (missingUris.length > 0) {
       const msg = autoSync
@@ -61,6 +61,6 @@ async function getPlaylistTracksWithCache(uri: string) {
 
 function extractTrackUris(items: PlaylistContentsResponse['items']): string[] {
    return items
-      .filter((item) => item.uri?.startsWith("spotify:track:") && item.isPlayable)
+      .filter((item) => item.uri?.startsWith('spotify:track:') && item.isPlayable)
       .map((item) => item.uri);
 }
